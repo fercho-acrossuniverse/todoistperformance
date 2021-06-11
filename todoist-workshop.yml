@@ -1,0 +1,71 @@
+config:
+  target: "https://api.todoist.com"
+  phases:
+    - duration: 1
+      arrivalRate: 1
+      name: "Warm up"
+  processor: "./readArray.js"
+  defaults:
+    headers:
+      Authorization: Bearer 119557fc4dca5d6ff5a1f5a618ac7e9573dcd06d
+      Content-Type: application/json
+  variables:
+    project_name:
+      - "Performance Testing Project"
+    url_project:
+      - "/rest/v1/projects"
+    task_name:
+      - "task performance"
+    url_task:
+      - "/rest/v1/tasks"
+scenarios:
+  - flow:
+    - get:
+        url: "{{ url_task }}"
+    - post:
+        url: "{{ url_project }}"
+        json:
+          name: "{{ project_name }}"
+        capture:
+          json: "$.id"
+          as: "id_project"
+    - log: "Project ID is {{ id_project }}"
+    - post:
+        url: "{{ url_task }}"
+        json:
+          content: "{{ task_name }}"
+          project_id: "{{ id_project }}"
+        capture:
+          json: "$.id"
+          as: "id_task"
+    - log: "Task ID created {{ id_task }}"
+    - think: 5
+    - get:
+        url: "{{ url_task }}/{{ id_task }}"
+        capture:
+          json: "$.id"
+          as: "get_taskid"
+    - log: "ID number response is: {{ get_taskid }}"
+    - think: 5
+    - post:
+        url: "{{ url_task }}/{{ id_task }}"
+        json:
+          content: "Buy soda and watermelon"
+    - log: "Task ID: {{ get_taskid }} updated"
+    - think: 5
+    - post:
+        url: "{{ url_task }}/{{ id_task }}/close"
+    - log: "Following task: {{ get_taskid }} was completed"
+    - think: 5
+    - post:
+        url: "{{ url_task }}/{{ id_task }}/reopen"
+    - log: "Following task: {{ get_taskid }} was re-opened"
+    - think: 5
+    - delete:
+        url: "{{ url_task }}/{{ id_task }}"
+    - log: "Following task: {{ id_task }} was deleted"
+    - think: 5
+    - delete:
+        url: "{{ url_project }}/{{ id_project }}"
+    - log: "Following project: {{ id_project }} was deleted"
+    - think: 15

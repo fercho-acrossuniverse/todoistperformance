@@ -1,0 +1,15 @@
+{
+  "name": "artillery-workshopdeliver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "artillery run todoist-workshop.yml"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "artillery": "^1.7.2"
+  }
+}
